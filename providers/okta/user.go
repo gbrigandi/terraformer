@@ -26,13 +26,14 @@ type UserGenerator struct {
 func (g UserGenerator) createResources(userList []*okta.User) []terraformutils.Resource {
 	var resources []terraformutils.Resource
 	for _, user := range userList {
-
-		resources = append(resources, terraformutils.NewSimpleResource(
+		resource := terraformutils.NewSimpleResource(
 			user.Id,
 			"user_"+user.Id,
 			"okta_user",
 			"okta",
-			[]string{}))
+			[]string{})
+
+		resources = append(resources, resource)
 	}
 	return resources
 }

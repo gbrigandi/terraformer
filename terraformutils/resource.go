@@ -146,6 +146,29 @@ func (r *Resource) ParseTFstate(parser Flatmapper, impliedType cty.Type) error {
 		return err
 	}
 
+	// escape the dollar sign so that it is not interpreted by terraform as string interpoletation.
+
+	for key, value := range attributes {
+		valueStr, is_string := value.(string)
+		if is_string {
+			attributes[key] = strings.Replace(valueStr, "${", "$${", -1)
+		}
+
+		valueList, isList := value.([]interface{})
+		if isList {
+			s := make([]string, len(valueList))
+			for i, v := range valueList {
+				valueStr, is_string := v.(string)
+				if is_string {
+					s[i] = strings.Replace(valueStr, "${", "$${", -1)
+					attributes[key] = s
+				}
+
+				// TODO: handle list of maps
+			}
+		}
+	}
+
 	// add Additional Fields to resource
 	for key, value := range r.AdditionalFields {
 		attributes[key] = value

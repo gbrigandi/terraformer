@@ -28,13 +28,20 @@ type AppOAuthGenerator struct {
 func (g AppOAuthGenerator) createResources(appList []*okta.Application) []terraformutils.Resource {
 	var resources []terraformutils.Resource
 	for _, app := range appList {
-		resources = append(resources, terraformutils.NewSimpleResource(
+		resource := terraformutils.NewSimpleResource(
 			app.Id,
 			normalizeResourceName(app.Id+"_"+app.Name),
 			"okta_app_oauth",
 			"okta",
-			[]string{}))
+			[]string{})
+
+		resource.IgnoreKeys = append(resource.IgnoreKeys,
+			"^implicit_assignment$",
+		)
+
+		resources = append(resources, resource)
 	}
+
 	return resources
 }
 
